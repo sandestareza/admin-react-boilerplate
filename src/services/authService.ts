@@ -24,7 +24,7 @@ const MOCK_USER: User = {
   id: '1',
   email: 'admin@example.com',
   name: 'Admin User',
-  role: 'admin',
+  role: 'user',
   avatar: 'https://github.com/shadcn.png'
 };
 

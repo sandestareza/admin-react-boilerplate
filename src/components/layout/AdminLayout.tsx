@@ -1,18 +1,13 @@
 import { Outlet, Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { 
-  LayoutDashboard,
-  Users,
-  Settings,
-  LogOut,
   Menu,
   X,
   ChevronDown,
   ChevronRight,
-  Package,
-  ShoppingCart,
   Bell,
   MoreVertical,
-  LineChart,
+  Settings,
+  LogOut
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -28,26 +23,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
 import { ModeToggle } from '@/components/mode-toggle'
 
-type NavigationItem = {
-  name: string
-  href?: string
-  icon: any
-  children?: NavigationItem[]
-}
-
-const navigation: NavigationItem[] = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  {
-    name: 'Master Data',
-    icon: Package,
-    children: [
-      { name: 'Products', href: '/admin/products', icon: Package },
-      { name: 'Users', href: '/admin/users', icon: Users },
-    ]
-  },
-  { name: 'Transactions', href: '/admin/transactions', icon: ShoppingCart },
-  { name: 'Analytics', href: '/admin/analytics', icon: LineChart },
-]
+import { getFilteredNavigation, type NavigationItem } from '@/config/menu'
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -77,6 +53,8 @@ export function AdminLayout() {
   const location = useLocation()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  
+  const navigation = getFilteredNavigation(user?.role)
 
   const handleLogout = () => {
     logout()

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Search, Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react'
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { RoleBasedButton } from '@/components/common/RoleBasedButton'
 
 const mockUsers = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', createdAt: '2024-01-15' },
@@ -29,10 +30,10 @@ export function UsersPage() {
           <h1 className="text-3xl font-bold">Users</h1>
           <p className="text-muted-foreground mt-1">Manage your users and their permissions.</p>
         </div>
-        <Button>
+        <RoleBasedButton allowedRoles={['admin']} onClick={() => {}}>
           <Plus className="mr-2 h-4 w-4" />
           Add User
-        </Button>
+        </RoleBasedButton>
       </div>
 
       {/* Search and filters */}
@@ -104,13 +105,14 @@ export function UsersPage() {
                     <td className="py-3 px-4 text-sm text-muted-foreground">{user.createdAt}</td>
                     <td className="py-3 px-4 text-right">
                       <div className="relative inline-block">
-                        <Button
+                        <RoleBasedButton 
+                          allowedRoles={['admin']}
                           variant="ghost"
                           size="icon"
                           onClick={() => setMenuOpen(menuOpen === user.id ? null : user.id)}
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        </RoleBasedButton>
                         {menuOpen === user.id && (
                           <>
                             <div
