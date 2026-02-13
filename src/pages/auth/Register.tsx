@@ -1,26 +1,13 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button, Input, Label, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui'
-import { useAuthStore } from '@/stores/authStore'
 import { useState } from 'react'
+import { registerSchema, type RegisterFormData } from '@/validations/authValidation'
 
-const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-})
-
-type RegisterFormData = z.infer<typeof registerSchema>
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const { login } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
 
   const {
@@ -33,23 +20,15 @@ export function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
+    console.log({data});
     
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
     
     // Mock registration - replace with actual API call
-    login(
-      {
-        id: '1',
-        email: data.email,
-        name: data.name,
-        role: 'user',
-      },
-      'mock-token-12345'
-    )
     
     setIsLoading(false)
-    navigate({ to: '/admin/dashboard' })
+    navigate({ to: '/login' })
   }
 
   return (

@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { type ProductFormData } from "@/validations/product";
+import { type ProductFormData } from "@/validations/productValidation";
 
 export interface Product {
   id: number;

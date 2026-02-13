@@ -101,6 +101,7 @@ export function SettingsPage() {
                   type="email"
                   error={profileForm.formState.errors.email?.message}
                   {...profileForm.register('email')}
+                  disabled
                 />
               </div>
 

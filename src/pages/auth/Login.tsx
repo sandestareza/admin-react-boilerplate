@@ -1,22 +1,15 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Button, Input, Label, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
-import { useState } from 'react'
+import { loginSchema, type LoginFormData } from '@/validations/authValidation'
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const { login } = useAuthStore()
-  const [isLoading, setIsLoading] = useState(false)
+  const { login, isLoading, error: authError } = useAuthStore()
+  // const [isLoading, setIsLoading] = useState(false) // Use store loading state
 
   const {
     register,
@@ -27,24 +20,21 @@ export function LoginPage() {
   })
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true)
+    // setIsLoading(true) // Handled by store
     
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // await new Promise((resolve) => setTimeout(resolve, 1000))
     
-    // Mock login - replace with actual API call
-    login(
-      {
-        id: '1',
-        email: data.email,
-        name: 'Admin User',
-        role: 'admin',
-      },
-      'mock-token-12345'
-    )
-    
-    setIsLoading(false)
-    navigate({ to: '/admin/dashboard' })
+    try {
+        await login({
+            email: data.email,
+            password: data.password
+        })
+        navigate({ to: '/admin/dashboard' })
+    } catch (error) {
+        console.error("Login failed", error)
+        // Error is handled by store and displayed below
+    }
   }
 
   return (
@@ -54,6 +44,11 @@ export function LoginPage() {
         <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
       <CardContent>
+        {authError && (
+            <div className="mb-4 p-3 rounded-md bg-destructive/15 text-destructive text-sm font-medium">
+                {authError}
+            </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" required>Email</Label>

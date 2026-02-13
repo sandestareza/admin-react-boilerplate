@@ -9,8 +9,20 @@ import {
   ChevronDown,
   ChevronRight,
   Package,
-  ShoppingCart
+  ShoppingCart,
+  Bell,
+  MoreVertical,
+  LineChart,
 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
@@ -33,16 +45,35 @@ const navigation: NavigationItem[] = [
       { name: 'Users', href: '/admin/users', icon: Users },
     ]
   },
-  { name: 'Transactions', href: '/admin/transactions', icon: ShoppingCart }, // Placeholder
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: 'Transactions', href: '/admin/transactions', icon: ShoppingCart },
+  { name: 'Analytics', href: '/admin/analytics', icon: LineChart },
 ]
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  // const [userMenuOpen, setUserMenuOpen] = useState(false) // No longer needed
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
     'Master Data': true // Default open for demo
   })
+
+  // Mock Notifications
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'New User Registered', message: 'A new user has signed up.', time: '5m ago', read: false },
+    { id: 2, title: 'System Update', message: 'System maintenance scheduled.', time: '1h ago', read: false },
+    { id: 3, title: 'New Order', message: 'Order #1234 has been placed.', time: '2h ago', read: true },
+    { id: 4, title: 'Server Alert', message: 'High CPU usage detected.', time: '5h ago', read: false },
+    { id: 5, title: 'Backup Completed', message: 'Daily backup successful.', time: '1d ago', read: true },
+  ])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const markAsRead = (id: number) => {
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })))
+  }
   const location = useLocation()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
@@ -132,7 +163,7 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 transform bg-sidebar border-r border-sidebar-border transition-transform duration-200 ease-in-out lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-64 transform bg-sidebar border-r border-sidebar-border transition-transform duration-200 ease-in-out lg:translate-x-0 flex flex-col',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -159,13 +190,38 @@ export function AdminLayout() {
 
         {/* User section at bottom */}
         <div className="border-t border-sidebar-border p-4">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            Logout
-          </button>
+            <div className="flex items-center gap-3 w-full px-2 py-2 rounded-lg hover:bg-sidebar-accent transition-colors group">
+              <div className="h-9 w-9 rounded-full border border-sidebar-border overflow-hidden bg-muted flex items-center justify-center">
+                 {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                 ) : (
+                    <span className="text-xs font-medium text-muted-foreground">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                 )}
+              </div>
+              <div className="flex-1 flex flex-col min-w-0">
+                <span className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || 'User'}</span>
+                <span className="text-xs text-muted-foreground truncate">{user?.role || 'Admin'}</span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-sidebar-foreground">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56" side="top">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate({ to: '/admin/settings' })}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive font-bold focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
         </div>
       </aside>
 
@@ -180,56 +236,66 @@ export function AdminLayout() {
             <Menu className="h-6 w-6" />
           </button>
 
-          <div className="flex items-center gap-4 ml-auto">
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Notifications */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-background" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+                  <span className="font-semibold text-sm">Notifications</span>
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={markAllAsRead}
+                      className="text-xs text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-[300px] overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      No notifications
+                    </div>
+                  ) : (
+                    <div className="grid gap-1 p-1">
+                      {notifications.map((notification) => (
+                        <DropdownMenuItem 
+                          key={notification.id} 
+                          className={cn(
+                            "flex flex-col items-start gap-1 p-3 cursor-pointer",
+                            !notification.read && "bg-accent/50"
+                          )}
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <div className="flex w-full items-start justify-between gap-2">
+                            <span className={cn("text-sm font-medium leading-none", !notification.read && "text-foreground")}>
+                              {notification.title}
+                            </span>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {notification.time}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {notification.message}
+                          </p>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Theme Toggle */}
             <ModeToggle />
-            
-            {/* User Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-accent transition-colors"
-                id="user-menu-button"
-              >
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                  <span className="text-primary font-bold text-sm">
-                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <div className="hidden md:flex flex-col items-start pr-2">
-                  <span className="text-sm font-medium leading-none mb-1">{user?.name || 'User'}</span>
-                  <span className="text-xs text-muted-foreground leading-none">{user?.role || 'Admin'}</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </button>
-
-              {userMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setUserMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-border bg-popover p-1 shadow-lg z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-2 py-1.5 text-sm font-semibold border-b border-border mb-1">
-                      My Account
-                    </div>
-                    <Link 
-                      to="/admin/settings" 
-                      className="block px-2 py-1.5 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      Settings
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-2 py-1.5 text-sm text-destructive rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
           </div>
         </header>
 

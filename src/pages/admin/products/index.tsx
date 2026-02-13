@@ -25,7 +25,7 @@ import {
   DialogFooter,
 } from "@/components/ui";
 import { cn, formatCurrency } from "@/lib/utils";
-import { productSchema, type ProductFormData } from "@/validations/product";
+import { productSchema, type ProductFormData } from "@/validations/productValidation";
 import { productService, type Product } from "@/services/productService";
 
 export function ProductsPage() {
