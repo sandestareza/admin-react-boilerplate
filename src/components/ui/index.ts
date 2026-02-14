@@ -41,3 +41,6 @@ export * from "./command";
 export * from "./skeleton";
 export * from "./alert-dialog";
 export * from "./sonner";
+export * from "./form";
+export * from "./textarea";
+export * from "./checkbox";

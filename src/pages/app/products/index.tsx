@@ -11,13 +11,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   Button,
-  Input,
   Dialog,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogContent,
-  Label,
+  Form,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -31,6 +30,8 @@ import { productService, type Product } from "@/services/productService";
 import { DataTable } from "@/components/common/DataTable";
 import { TableSkeleton } from "@/components/common/TableSkeleton";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { FormInput } from "@/components/common/form/FormInput";
+import { FormSelect } from "@/components/common/form/FormSelect";
 import { type ColumnDef } from "@tanstack/react-table";
 
 export function ProductsPage() {
@@ -56,7 +57,7 @@ export function ProductsPage() {
         (old: (Product & { name: string })[]) => [data, ...old],
       );
       setIsDialogOpen(false);
-      reset();
+      form.reset();
       toast.success("Product created successfully");
     },
     onError: (error) => {
@@ -74,7 +75,7 @@ export function ProductsPage() {
       );
       setIsDialogOpen(false);
       setEditingProduct(null);
-      reset();
+      form.reset();
       toast.success("Product updated successfully");
     },
     onError: (error) => {
@@ -98,17 +99,14 @@ export function ProductsPage() {
   });
 
   // Form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<ProductFormData>({
-    // Explicitly cast resolver to avoid type conflicts
+  const form = useForm<ProductFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(productSchema) as any,
     defaultValues: {
+      name: "",
+      price: 0,
+      category: "",
+      stock: 0,
       status: "active",
     },
   });
@@ -116,11 +114,11 @@ export function ProductsPage() {
   // Handlers
   const handleEdit = (product: Product & { name: string }) => {
     setEditingProduct(product);
-    setValue("name", product.name!);
-    setValue("price", product.price || 0);
-    setValue("category", product.category || "General");
-    setValue("stock", product.stock || 0);
-    setValue("status", product.status || "active");
+    form.setValue("name", product.name!);
+    form.setValue("price", product.price || 0);
+    form.setValue("category", product.category || "General");
+    form.setValue("stock", product.stock || 0);
+    form.setValue("status", product.status || "active");
     setIsDialogOpen(true);
   };
 
@@ -137,9 +135,17 @@ export function ProductsPage() {
   const handleCloseDialog = (open: boolean) => {
     if (!open) {
       setEditingProduct(null);
-      reset();
+      form.reset();
     }
     setIsDialogOpen(open);
+  };
+
+  const onSubmit = (data: ProductFormData) => {
+    if (editingProduct) {
+      updateMutation.mutate({ ...data, id: editingProduct.id });
+    } else {
+      createMutation.mutate(data);
+    }
   };
 
   // Columns Definition
@@ -297,117 +303,65 @@ export function ProductsPage() {
             </DialogTitle>
           </DialogHeader>
 
-          <form
-            onSubmit={handleSubmit((data) => {
-              if (editingProduct) {
-                updateMutation.mutate({ ...data, id: editingProduct.id });
-              } else {
-                createMutation.mutate(data);
-              }
-            })}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="name" required>
-                Name
-              </Label>
-              <Input
-                id="name"
-                {...register("name")}
-                error={errors.name?.message}
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              <FormInput
+                control={form.control}
+                name="name"
+                label="Name"
+                description="Mapped to JSONPlaceholder 'title'"
               />
-              <p className="text-xs text-muted-foreground">
-                Mapped to JSONPlaceholder "title"
-              </p>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price" required>
-                  Price
-                </Label>
-                <Input
+              <div className="grid grid-cols-2 gap-4">
+                <FormInput
+                  control={form.control}
+                  name="price"
+                  label="Price"
                   type="number"
-                  id="price"
-                  {...register("price")}
-                  error={errors.price?.message}
+                />
+                <FormInput
+                  control={form.control}
+                  name="stock"
+                  label="Stock"
+                  type="number"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="stock" required>
-                  Stock
-                </Label>
-                <Input
-                  type="number"
-                  id="stock"
-                  {...register("stock")}
-                  error={errors.stock?.message}
-                />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category" required>
-                Category
-              </Label>
-              <Input
-                id="category"
-                {...register("category")}
-                error={errors.category?.message}
+              <FormInput
+                control={form.control}
+                name="category"
+                label="Category"
+                description="Mapped to JSONPlaceholder 'body'"
               />
-              <p className="text-xs text-muted-foreground">
-                Mapped to JSONPlaceholder "body"
-              </p>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status" required>
-                Status
-              </Label>
-              <select
-                id="status"
-                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                {...register("status")}
-              >
-                <option
-                  value="active"
-                  className="bg-popover text-popover-foreground"
-                >
-                  Active
-                </option>
-                <option
-                  value="draft"
-                  className="bg-popover text-popover-foreground"
-                >
-                  Draft
-                </option>
-                <option
-                  value="archived"
-                  className="bg-popover text-popover-foreground"
-                >
-                  Archived
-                </option>
-              </select>
-              {errors.status && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.status.message}
-                </p>
-              )}
-            </div>
+              <FormSelect
+                control={form.control}
+                name="status"
+                label="Status"
+                options={[
+                  { label: "Active", value: "active" },
+                  { label: "Draft", value: "draft" },
+                  { label: "Archived", value: "archived" },
+                ]}
+              />
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleCloseDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" isLoading={isSubmitting}>
-                {editingProduct ? "Update Product" : "Create Product"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleCloseDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" isLoading={form.formState.isSubmitting}>
+                  {editingProduct ? "Update Product" : "Create Product"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
