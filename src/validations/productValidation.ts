@@ -6,6 +6,7 @@ export const productSchema = z.object({
   category: z.string().min(1, "Category is required"),
   stock: z.coerce.number().int().min(0, "Stock must be positive"),
   status: z.enum(["active", "draft", "archived"]),
+  image: z.any().optional(), // File[] or string (url)
 });
 
 export type ProductFormData = z.infer<typeof productSchema>

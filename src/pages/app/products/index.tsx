@@ -32,6 +32,7 @@ import { TableSkeleton } from "@/components/common/TableSkeleton";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { FormInput } from "@/components/common/form/FormInput";
 import { FormSelect } from "@/components/common/form/FormSelect";
+import { FormFileUpload } from "@/components/common/form/FormFileUpload";
 import { type ColumnDef } from "@tanstack/react-table";
 
 export function ProductsPage() {
@@ -346,6 +347,18 @@ export function ProductsPage() {
                   { label: "Draft", value: "draft" },
                   { label: "Archived", value: "archived" },
                 ]}
+              />
+
+              <FormFileUpload
+                control={form.control}
+                name="image"
+                label="Product Image"
+                description="Upload product image (max 5MB)"
+                maxFiles={1}
+                accept={{
+                  "image/*": [],
+                  "application/pdf": [],
+                }}
               />
 
               <DialogFooter>
