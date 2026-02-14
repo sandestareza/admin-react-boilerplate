@@ -38,3 +38,6 @@ export * from "./separator";
 export * from "./badge";
 export * from "./popover";
 export * from "./command";
+export * from "./skeleton";
+export * from "./alert-dialog";
+export * from "./sonner";

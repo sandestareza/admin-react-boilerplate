@@ -4,11 +4,11 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  Loader2,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
   Button,
   Input,
@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogContent, // Added this
+  DialogContent,
   Label,
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,8 @@ import { formatCurrency, cn } from "@/lib/utils";
 import { productSchema, type ProductFormData } from "@/validations/productValidation";
 import { productService, type Product } from "@/services/productService";
 import { DataTable } from "@/components/common/DataTable";
+import { TableSkeleton } from "@/components/common/TableSkeleton";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { type ColumnDef } from "@tanstack/react-table";
 
 export function ProductsPage() {
@@ -37,6 +39,7 @@ export function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<
     (Product & { name: string }) | null
   >(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   // Queries
   const { data: products = [], isLoading } = useQuery({
@@ -54,7 +57,11 @@ export function ProductsPage() {
       );
       setIsDialogOpen(false);
       reset();
+      toast.success("Product created successfully");
     },
+    onError: (error) => {
+      toast.error(`Failed to create product: ${error}`);
+    }
   });
 
   const updateMutation = useMutation({
@@ -68,7 +75,11 @@ export function ProductsPage() {
       setIsDialogOpen(false);
       setEditingProduct(null);
       reset();
+      toast.success("Product updated successfully");
     },
+    onError: (error) => {
+      toast.error(`Failed to update product: ${error}`);
+    }
   });
 
   const deleteMutation = useMutation({
@@ -78,7 +89,12 @@ export function ProductsPage() {
         ["products"],
         (old: (Product & { name: string })[]) => old.filter((p) => p.id !== id),
       );
+      setDeleteId(null);
+      toast.success("Product deleted successfully");
     },
+    onError: (error) => {
+      toast.error(`Failed to delete product: ${error}`);
+    }
   });
 
   // Form
@@ -108,9 +124,13 @@ export function ProductsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (id: number) => {
+    setDeleteId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      deleteMutation.mutate(deleteId);
     }
   };
 
@@ -153,6 +173,10 @@ export function ProductsPage() {
     {
       accessorKey: "stock",
       header: "Stock",
+      cell: ({ row }) => {
+        const stock = parseFloat(row.getValue("stock"));
+        return <div>{stock}</div>;
+      },
     },
     {
       accessorKey: "status",
@@ -194,7 +218,7 @@ export function ProductsPage() {
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => handleDelete(product.id)}
+                  onClick={() => handleDeleteClick(product.id)}
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -210,9 +234,16 @@ export function ProductsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Loading products...</p>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Products</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your product inventory (Data Table).
+            </p>
+          </div>
+        </div>
+        <TableSkeleton rowCount={5} columnCount={7} />
       </div>
     );
   }
@@ -379,6 +410,17 @@ export function ProductsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

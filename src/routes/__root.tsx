@@ -2,6 +2,7 @@ import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { NotFound } from '@/components/common/NotFound'
 import { GlobalError } from '@/components/common/GlobalError'
+import { Toaster } from "@/components/ui/sonner"
 import nprogress from 'nprogress'
 import { useEffect } from 'react'
 
@@ -21,6 +22,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
+      <Toaster />
       {import.meta.env.DEV && <TanStackRouterDevtools />}
     </>
   )
