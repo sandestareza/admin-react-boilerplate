@@ -30,7 +30,7 @@ export function LoginPage() {
             email: data.email,
             password: data.password
         })
-        navigate({ to: '/admin/dashboard' })
+        navigate({ to: '/dashboard' })
     } catch (error) {
         console.error("Login failed", error)
         // Error is handled by store and displayed below

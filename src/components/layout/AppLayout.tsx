@@ -25,7 +25,7 @@ import { ModeToggle } from '@/components/mode-toggle'
 
 import { getFilteredNavigation, type NavigationItem } from '@/config/menu'
 
-export function AdminLayout() {
+export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   // const [userMenuOpen, setUserMenuOpen] = useState(false) // No longer needed
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
@@ -147,7 +147,7 @@ export function AdminLayout() {
       >
         {/* Logo */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-sidebar-border">
-          <Link to="/admin/dashboard" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">A</span>
             </div>
@@ -189,7 +189,7 @@ export function AdminLayout() {
                 <DropdownMenuContent align="end" className="w-56" side="top">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate({ to: '/admin/settings' })}>
+                  <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>

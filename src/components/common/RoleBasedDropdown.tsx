@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { RoleGuard } from "./RoleGuard"
-import { type User } from "@/stores/authStore"
+import type { User } from "@/types/user"
 import React, { type ReactNode } from "react"
 
 // For the Dropdown itself, we might want to hide the TRIGGER if the user has no access to ANY items?

@@ -1,20 +1,22 @@
 import { useState } from 'react'
 import { Search, Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react'
-import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
+import { Input, Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { RoleBasedButton } from '@/components/common/RoleBasedButton'
 
-const mockUsers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', createdAt: '2024-01-15' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'user', status: 'active', createdAt: '2024-01-14' },
-  { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'user', status: 'pending', createdAt: '2024-01-13' },
-  { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'user', status: 'active', createdAt: '2024-01-12' },
-  { id: 5, name: 'Charlie Davis', email: 'charlie@example.com', role: 'user', status: 'inactive', createdAt: '2024-01-11' },
+import type { User } from '@/types/user'
+
+const mockUsers: User[] = [
+  { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', createdAt: '2024-01-15' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'user', status: 'active', createdAt: '2024-01-14' },
+  { id: '3', name: 'Bob Wilson', email: 'bob@example.com', role: 'user', status: 'pending', createdAt: '2024-01-13' },
+  { id: '4', name: 'Alice Brown', email: 'alice@example.com', role: 'user', status: 'active', createdAt: '2024-01-12' },
+  { id: '5', name: 'Charlie Davis', email: 'charlie@example.com', role: 'user', status: 'inactive', createdAt: '2024-01-11' },
 ]
 
 export function UsersPage() {
   const [search, setSearch] = useState('')
-  const [menuOpen, setMenuOpen] = useState<number | null>(null)
+  const [menuOpen, setMenuOpen] = useState<string | null>(null)
 
   const filteredUsers = mockUsers.filter(
     (user) =>

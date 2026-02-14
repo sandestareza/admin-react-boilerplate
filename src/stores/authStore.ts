@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { authService, type User, type LoginCredentials } from '@/services/authService' // Use shared types
-
-// Re-export User for convenience in components
-export type { User }
+import { authService, type LoginCredentials } from '@/services/authService'
+import type { User } from '@/types/user'
 
 interface AuthState {
   user: User | null

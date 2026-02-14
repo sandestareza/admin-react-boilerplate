@@ -6,7 +6,7 @@ import {
   ShoppingCart, 
   LineChart 
 } from 'lucide-react'
-import { type User } from '@/services/authService'
+import { type User } from '@/types/user'
 
 export interface NavigationItem {
   name: string
@@ -19,7 +19,7 @@ export interface NavigationItem {
 export const navigation: NavigationItem[] = [
   { 
     name: 'Dashboard', 
-    href: '/admin/dashboard', 
+    href: '/dashboard', 
     icon: LayoutDashboard,
     roles: ['admin', 'user'] 
   },
@@ -29,25 +29,25 @@ export const navigation: NavigationItem[] = [
     icon: Package,
     roles: ['admin', 'user'], // Admin only
     children: [
-      { name: 'Products', href: '/admin/products', icon: Package, roles: ['admin'] },
-      { name: 'Users', href: '/admin/users', icon: Users, roles: ['admin', 'user'] },
+      { name: 'Products', href: '/products', icon: Package, roles: ['admin'] },
+      { name: 'Users', href: '/users', icon: Users, roles: ['admin', 'user'] },
     ]
   },
   { 
     name: 'Transactions', 
-    href: '/admin/transactions', 
+    href: '/transactions', 
     icon: ShoppingCart,
     roles: ['admin', 'user']
   },
   { 
     name: 'Analytics', 
-    href: '/admin/analytics', 
+    href: '/analytics', 
     icon: LineChart,
     roles: ['admin'] // Admin only
   },
   { 
     name: 'Settings', 
-    href: '/admin/settings', 
+    href: '/settings', 
     icon: Settings,
     roles: ['admin'] // Admin only
   },

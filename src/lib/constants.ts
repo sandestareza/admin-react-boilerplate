@@ -6,9 +6,9 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
-  DASHBOARD: '/admin/dashboard',
-  USERS: '/admin/users',
-  SETTINGS: '/admin/settings',
+  DASHBOARD: '/dashboard',
+  USERS: '/users',
+  SETTINGS: '/settings',
 } as const
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'

@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_auth')({
     
     // Redirect to dashboard if already authenticated
     if (isAuthenticated) {
-      throw redirect({ to: '/admin/dashboard' })
+      throw redirect({ to: '/dashboard' })
     }
   },
   component: AuthLayout,

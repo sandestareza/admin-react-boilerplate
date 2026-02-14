@@ -1,13 +1,5 @@
+import type { User } from "@/types/user";
 // import { api } from "@/lib/api";
-
-// Define strict types for the service
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  role: 'admin' | 'user';
-}
 
 export interface LoginCredentials {
   email: string;
@@ -25,7 +17,8 @@ const MOCK_USER: User = {
   email: 'admin@example.com',
   name: 'Admin User',
   role: 'user',
-  avatar: 'https://github.com/shadcn.png'
+  avatar: 'https://github.com/shadcn.png',
+  status: 'active'
 };
 
 const MOCK_TOKEN = 'mock-token-12345-' + Date.now();
