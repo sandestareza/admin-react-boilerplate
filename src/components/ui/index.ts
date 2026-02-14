@@ -11,7 +11,7 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Label } from './label'
 
 // Dialog
-export { Dialog, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from './dialog'
+export { Dialog, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogContent } from './dialog'
 
 // Dropdown Menu
 export {
@@ -31,3 +31,10 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 } from './dropdown-menu'
+
+export * from "./table";
+export * from "./select";
+export * from "./separator";
+export * from "./badge";
+export * from "./popover";
+export * from "./command";
