@@ -14,14 +14,17 @@ const mockUsers: User[] = [
   { id: '5', name: 'Charlie Davis', email: 'charlie@example.com', role: 'user', status: 'inactive', createdAt: '2024-01-11' },
 ]
 
+import { useDebounce } from '@/hooks/useDebounce'
+
 export function UsersPage() {
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
 
   const filteredUsers = mockUsers.filter(
     (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
+      user.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(debouncedSearch.toLowerCase())
   )
 
   return (

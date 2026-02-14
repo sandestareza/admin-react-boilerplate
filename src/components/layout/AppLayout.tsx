@@ -18,17 +18,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
 import { ModeToggle } from '@/components/mode-toggle'
 
 import { getFilteredNavigation, type NavigationItem } from '@/config/menu'
 
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const isDesktop = useMediaQuery('(min-width: 1024px)')
+
+  // Close sidebar automatically when switching to desktop view
+  useEffect(() => {
+    if (isDesktop && sidebarOpen) {
+      setSidebarOpen(false)
+    }
+  }, [isDesktop, sidebarOpen])
+
   // const [userMenuOpen, setUserMenuOpen] = useState(false) // No longer needed
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
+  const [expandedMenus, setExpandedMenus] = useLocalStorage<Record<string, boolean>>('expanded-menus', {
     'Master Data': true // Default open for demo
   })
 
